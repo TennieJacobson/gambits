@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Run | GamBits</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="lexer.js"></script>
+</head>
+<body>
+
+<div id="container" style="width:100%;float:left;">
+
+    <h1>GamBits</h1>
+
+    <div id="inputSide" class="col">
+        <textarea id="code" rows="35" style="width:100%"></textarea>
+        <button id="btnRun" onclick="runCode()">Run!</button>
+    </div>
+
+    <div id="outputSide" class="col">
+        <h2>Output</h2>
+        <div id="output"></div>
+    </div>
+
+</div>
+
+</body>
+<script>
+
+//set up tabs to work and ctl enter to run the code.
+document.getElementById('code').onkeydown = function(e) {
+    if(e.keyCode == 9){
+        e.preventDefault();
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
+        this.value = this.value.substring(0,start) + '\t' + this.value.substring(end);
+    }
+    //ctl enter = run
+    if(e.ctrlKey && e.keyCode == 13){
+        runCode();
+    }
+}
+
+//run the code.
+function runCode(){
+    //feed through lexer, parser, then run.
+    var text = document.getElementById('code').value;
+    lex(text);
+}
+
+</script>
+</html>

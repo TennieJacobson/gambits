@@ -1,0 +1,24 @@
+* {
+    box-sizing: border-box;
+}
+
+#outputSide {
+    padding: 20px;
+}
+
+.col {
+    width: 50%;
+    float: left;
+}
+
+#output {
+    border-style: solid;
+    border-width: thin;
+    color: green;
+    width: 100%;
+    height: 400px;
+    overflow-y: scroll;
+    overflow-x: auto;
+}
+
+#btnRun {}
