@@ -70,3 +70,8 @@ Files: FILE(url)
 Arrays: []
 print: print
 boolean: true, false
+
+
+parseInt(binaryString, 2) -> bitstring to base 10.
+
+numObj.toString(2) -> number to base2 string.

@@ -4,6 +4,8 @@
     <title>Run | GamBits</title>
     <link rel="stylesheet" href="style.css">
     <script src="lexer.js"></script>
+    <script src="parser.js"></script>
+    <script src="ast.js"></script>
 </head>
 <body>
 
@@ -43,9 +45,22 @@ document.getElementById('code').onkeydown = function(e) {
 //run the code.
 function runCode(){
     //feed through lexer, parser, then run.
+    document.getElementById('output').innerHTML = "";
+
     var text = document.getElementById('code').value;
-    lex(text);
-	//tesing git
+
+    console.log(text);
+
+    var tokens = lex(text);
+
+    console.log(tokens);
+
+    var ast = parse(tokens);
+
+    var env = {};
+
+    //evaluate the block from the parser.
+    ast.evaluate(env);
 }
 
 </script>

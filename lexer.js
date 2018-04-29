@@ -4,6 +4,7 @@ var PLUS = 'PLUS';
 var DIVIDE = 'DIVIDE';
 var DASH = 'DASH';
 var ASTERISK = 'ASTERISK';
+var NROOT = 'NROOT';
 var COMMA = 'COMMA';
 var MOD = 'MOD';
 var OCTOTHORP = 'OCTOTHORP';
@@ -22,6 +23,7 @@ var WHILE = 'WHILE';
 var PRINT = 'PRINT';
 
 //literals
+var DECIMAL = 'DECIMAL';
 var INTEGER = 'INTEGER';
 var CHAR = 'CHAR';
 var STRING = 'STRING';
@@ -61,7 +63,6 @@ var NOT = 'NOT';
 
 
 function lex(source){
-  console.log(source);
 
   var tokens = [];
   var tokenSoFar = '';
@@ -100,11 +101,6 @@ function lex(source){
     } else if (has(/,/)) {
       devour();
       emit(COMMA);
-    // } else if (has(/\'/)) {
-    //   devour();
-    //   devour();
-    //   if(tokenSoFar == /)
-    //   emit(APOSTROPHE);
     } else if (has(/\"/)) {
       skip();
       while(has(/[^"]/)){
@@ -182,7 +178,12 @@ function lex(source){
       emit(ASTERISK);
     } else if (has(/\^/)) {
       devour();
-      emit(CARROT);
+      if(has(/\//)) {
+        devour();
+        emit(NROOT);
+      } else {
+        emit(CARROT);
+    }
     } else if (has(/\//)) {
       devour();
       emit(DIVIDE);
@@ -197,6 +198,12 @@ function lex(source){
         } else {
           throw 'bitstring is not in the correct binary format: [' + tokenSoFar + ']';
         }
+      } else if (has(/\./)) {
+        devour();
+        while(has(/\d/)){
+          devour();
+        }
+        emit(DECIMAL);
       } else {
         emit(INTEGER);
       }
@@ -250,5 +257,5 @@ function lex(source){
   }
 
   emit(EOF);
-  console.log(tokens);
+  return tokens;
 }

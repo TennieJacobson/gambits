@@ -19,6 +19,10 @@
     height: 400px;
     overflow-y: scroll;
     overflow-x: auto;
+    padding: 5px;
 }
 
-#btnRun {}
+#btnRun {
+  font-weight: bold;
+  border-radius: 3px;
+}
