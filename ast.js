@@ -1,3 +1,10 @@
+//Abstract Statement Tree
+// going to need lists still, which includes assigning a variable versus just accessing one
+// printbits will be needed.
+// function capabilities
+// almost there!
+
+
 function Block(statements) {
   this.evaluate = function(env) {
     statements.forEach(statement => statement.evaluate(env));
@@ -202,6 +209,10 @@ function StatementPrint(messageExpression) {
     output.innerHTML = output.innerHTML + message + '<br>';
     console.log(message);
   }
+}
+
+function StatementPrintBits(bitable) {
+    
 }
 
 function StatementAssignment(id, rhsExpression) {
