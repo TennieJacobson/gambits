@@ -30,16 +30,21 @@
 
 //set up tabs to work and ctl enter to run the code.
 document.getElementById('code').onkeydown = function(e) {
-    if(e.keyCode == 9){
-        e.preventDefault();
-        var start = this.selectionStart;
-        var end = this.selectionEnd;
-        this.value = this.value.substring(0,start) + '\t' + this.value.substring(end);
-    }
+  var tab = '  ';
+  if(e.keyCode == 9){
+    e.preventDefault();
+    var start = this.selectionStart;
+    var end = this.selectionEnd;
+
+    this.value = this.value.substring(0,start) + tab + this.value.substring(end);
+
+    //set the location of the cursor to the right of the tab.
+    this.selectionStart = end + tab.length;
+    this.selectionEnd = end + tab.length;
+  } else if(e.ctrlKey && e.keyCode == 13){
     //ctl enter = run
-    if(e.ctrlKey && e.keyCode == 13){
-        runCode();
-    }
+    runCode();
+  }
 }
 
 //run the code.
@@ -50,15 +55,12 @@ function runCode(){
     var text = document.getElementById('code').value;
 
     console.log(text);
-
     var tokens = lex(text);
 
     console.log(tokens);
-
     var ast = parse(tokens);
 
     var env = {};
-
     //evaluate the block from the parser.
     ast.evaluate(env);
 }
