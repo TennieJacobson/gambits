@@ -20,6 +20,11 @@ function parse(tokens) {
   }
 
   function statement() {
+ //   if(has(PRINT) && has(BOOL)){
+//      devour();
+//      var message = expression();
+//      return new StatementBoolPrint();
+//  } else 
     if(has(PRINT)){
       devour();
       var message = expression();
@@ -113,7 +118,7 @@ function parse(tokens) {
     }
     return val;
   }
-
+  
   function bitcompare(){
     var l = relational();
     while (has(BIT_AND) || has(XOR) || has(BIT_OR)){
@@ -217,7 +222,10 @@ function parse(tokens) {
   }
 
   function atom() {
-    if (has(INTEGER)) {
+    if(has(BOOL)){
+        var token = devour();
+        return new ExpressionBoolLiteral(token.source);
+    } else if (has(INTEGER)) {
       var token = devour();
       return new ExpressionIntegerLiteral(parseInt(token.source));
     } else if (has(DECIMAL)){
@@ -226,6 +234,9 @@ function parse(tokens) {
     } else if (has(BITSTRING)){
       var token = devour();
       return new ExpressionBitstringLiteral(token.source);
+    } else if(has(STRING)) {
+        var token = devour();
+        return new ExpressionStringLiteral(token.source);
     } else if (has(IDENTIFIER)) {
       var token = devour();
       return new ExpressionVariableReference(token.source);

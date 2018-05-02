@@ -17,10 +17,22 @@ function ExpressionDecimal(literal) {
   }
 }
 
+function ExpressionBoolLiteral(literal) {
+    this.evaluate = function(env) {
+        return literal;
+    }
+}
+
 function ExpressionBitstringLiteral(literal){
   this.evaluate = function(env) {
     return parseInt(literal, 2);
   }
+}
+
+function ExpressionStringLiteral(literal) {
+    this.evaluate = function(env) {
+        return literal;
+    }
 }
 
 function ExpressionIntegerLiteral(literal) {
@@ -209,6 +221,18 @@ function StatementPrint(messageExpression) {
     output.innerHTML = output.innerHTML + message + '<br>';
     console.log(message);
   }
+}
+
+function StatementBoolPrint(messageExpression) {
+    this.evaluate = function(env) {
+        var message = messageExpression.evaluate(env);
+        var output = document.getElementById('output');
+        if(message == 0){
+            output.innerHTML = output.innerHTML + "true" + '<br>';
+        } else {
+            output.innerHTML = output.innerHTML + "false" + '<br>';
+        }
+    }
 }
 
 function StatementPrintBits(bitable) {
