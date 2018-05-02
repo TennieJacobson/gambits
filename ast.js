@@ -1,11 +1,5 @@
-//Abstract Statement Tree
-// going to need lists still, which includes assigning a variable versus just accessing one
-// printbits will be needed.
-// function capabilities
-// almost there!
 
-
-function Block(statements) {
+n Block(statements) {
   this.evaluate = function(env) {
     statements.forEach(statement => statement.evaluate(env));
   }
@@ -17,7 +11,13 @@ function ExpressionDecimal(literal) {
   }
 }
 
-function ExpressionBoolLiteral(literal) {
+function ExpressionStringLiteral(literal) {
+    this.evaluate = function(env) {
+        return literal;
+    }
+}
+
+function ExpressionBoolLiteral(literal){
     this.evaluate = function(env) {
         return literal;
     }
@@ -27,12 +27,6 @@ function ExpressionBitstringLiteral(literal){
   this.evaluate = function(env) {
     return parseInt(literal, 2);
   }
-}
-
-function ExpressionStringLiteral(literal) {
-    this.evaluate = function(env) {
-        return literal;
-    }
 }
 
 function ExpressionIntegerLiteral(literal) {
@@ -95,6 +89,29 @@ function ExpressionLeftShift(a, b){
     var degree = b.evaluate(env);
     return start << degree >>> 0;
   }
+}
+
+function ExpressionBooleanAnd(a, b) {
+    this.evaluate = function(env) {
+        var l = a.evaluate(env);
+        var r = b.evaluate(env);
+        return l && r;
+    }
+}
+
+function ExpressionBooleanOr(a, b) {
+    this.evaluate = function(env) {
+        var l = a.evaluate(env);
+        var r = b.evaluate(env);
+        return l || r;
+    }
+}
+
+function ExpressionBooleanNot(a) {
+    this.evaluate = function(env) {
+        var l = a.evaluate(env);
+        return !(l);
+    }
 }
 
 function ExpressionBitAnd(a, b) {
@@ -223,20 +240,14 @@ function StatementPrint(messageExpression) {
   }
 }
 
-function StatementBoolPrint(messageExpression) {
+function StatementPrintBits(messageExpression) {
     this.evaluate = function(env) {
-        var message = messageExpression.evaluate(env);
-        var output = document.getElementById('output');
-        if(message == 0){
-            output.innerHTML = output.innerHTML + "true" + '<br>';
-        } else {
-            output.innerHTML = output.innerHTML + "false" + '<br>';
-        }
+      var message = messageExpression.evaluate(env);
+      var result = message.toString(2);
+      var output = document.getElementById('output');
+      output.innerHTML = output.innerHTML + result + '<br>';
+      console.log(message);
     }
-}
-
-function StatementPrintBits(bitable) {
-    
 }
 
 function StatementAssignment(id, rhsExpression) {
@@ -248,4 +259,23 @@ function StatementAssignment(id, rhsExpression) {
 Block
   Statements*
     Expressions*
+    print "hello world!"
+isPrime = 227
+
+FUN FUNCTION FOR PRIMES
+i = 2
+check = 0
+while i < isPrime
+  if isPrime % i == 0 then
+    check = 1
+  done
+  i = i + 1
+done
+
+if check == 0 then
+  print "FOUND A PRIME!"
+else
+  print "Not a prime"
+done
 */
+

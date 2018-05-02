@@ -1,5 +1,4 @@
-//expressions
-var IDENTIFIER = 'IDENTIFIER';
+DENTIFIER = 'IDENTIFIER';
 var PLUS = 'PLUS';
 var DIVIDE = 'DIVIDE';
 var DASH = 'DASH';
@@ -21,6 +20,7 @@ var DONE = 'DONE';
 var DEFINE = 'DEFINE';
 var WHILE = 'WHILE';
 var PRINT = 'PRINT';
+var PRINTBITS = 'PRINTBITS'
 
 //literals
 var DECIMAL = 'DECIMAL';
@@ -214,12 +214,14 @@ function lex(source){
 
       if(tokenSoFar == 'if') {
         emit(IF);
-      }else if(tokenSoFar == 'else'){
+      } else if(tokenSoFar == 'else'){
         emit(ELSE);
       } else if(tokenSoFar == 'done'){
         emit(DONE);
       } else if(tokenSoFar == 'while'){
         emit(WHILE);
+      } else if(tokenSoFar == 'printbits') {
+        emit(PRINTBITS);
       } else if(tokenSoFar == 'print'){
         emit(PRINT);
       } else if(tokenSoFar == 'flip'){
@@ -259,3 +261,4 @@ function lex(source){
   emit(EOF);
   return tokens;
 }
+

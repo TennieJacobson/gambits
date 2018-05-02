@@ -1,4 +1,5 @@
-function parse(tokens) {
+
+n parse(tokens) {
   var i = 0;
 
   function has(tokenType) {
@@ -24,27 +25,31 @@ function parse(tokens) {
 //      devour();
 //      var message = expression();
 //      return new StatementBoolPrint();
-//  } else 
+//  } else
     if(has(PRINT)){
+    devour();
+    var message = expression();
+    return new StatementPrint(message);
+  } else if(has(PRINTBITS)){
+    devour(); //printbits keyword
+    var message = expression();
+    return new StatementPrintBits(message);
+  } else if (has(IDENTIFIER)) {
+    var idToken = devour();
+    if (has(ASSIGN)){
       devour();
-      var message = expression();
-      return new StatementPrint(message);
-    } else if (has(IDENTIFIER)) {
-      var idToken = devour();
-      if (has(ASSIGN)){
-        devour();
-        var rhs = expression();
-        return new StatementAssignment(idToken.source, rhs);
-      } else {
-        throw 'Error, expected assignment after variable name. [' + idToken + ']';
-      }
-    } else if(has(IF)){
-      return conditional();
-    } else if(has(WHILE)) {
-      return loop();
+      var rhs = expression();
+      return new StatementAssignment(idToken.source, rhs);
     } else {
-      throw 'You messed up big time, idiot. I don\'t know ' + tokens[i].source;
+      throw 'Error, expected assignment after variable name. [' + idToken + ']';
     }
+  } else if(has(IF)){
+    return conditional();
+  } else if(has(WHILE)) {
+    return loop();
+  } else {
+    throw 'You messed up big time, idiot. I don\'t know ' + tokens[i].source;
+  }
 
     // if (has(RECTANGLE)) {
     //   devour();
@@ -59,9 +64,13 @@ function parse(tokens) {
   }
 
   function loop() {
-    devour();
+    devour(); //eat while keyword
 
     var condition = expression();
+    if(!has(THEN)){
+      throw 'expected "then" after "while" loop.\nloop: [' + condition.toString() + "]";
+    }
+    devour();//eat then keyword
     var statements = [];
 
     while(i < tokens.length && !has(DONE)){
@@ -79,7 +88,7 @@ function parse(tokens) {
 
 
   function conditional(){
-    devour(); //pass the if
+    devour(); //eat if keyword
     var condition = expression();
     if(!has(THEN)){
       throw 'expected "then" after "if" conditional.\ncondition: [' + condition.toString() + "]";
@@ -109,16 +118,34 @@ function parse(tokens) {
 
   function expression() {
     var val;
-    if(has(FLIP)){
-      devour();
-      var toFlip = expression();
-      val = new ExpressionFlip(toFlip);
+    if(has(FLIP) || has(NOT)){
+        var token = devour(); //see if flip or !
+        var toFlip = expression();
+        if(token.type == FLIP){
+            val = new ExpressionFlip(toFlip);
+        } else {
+            val = new ExpressionBooleanNot(toFlip);
+        }
     } else {
-      val = bitcompare();
+      val = bool();
     }
     return val;
   }
-  
+
+  function bool() {
+      var l = bitcompare();
+      while(has(AND) || has(OR)){
+          var operator = devour();
+          var r = bitcompare();
+          if(operator.type == AND){
+              l = new ExpressionBooleanAnd(l, r);
+          } else {
+              l = new ExpressionBooleanOr(l, r);
+          }
+      }
+      return l;
+  }
+
   function bitcompare(){
     var l = relational();
     while (has(BIT_AND) || has(XOR) || has(BIT_OR)){
@@ -129,7 +156,7 @@ function parse(tokens) {
         l = new ExpressionBitAnd(l, r);
       } else if(operator.type == XOR) {
         l = new ExpressionBitXOR(l, r);
-      } else if(operator.type == BIT_OR){
+      } else {
         l = new ExpressionBitOr(l, r);
       }
     }
@@ -255,3 +282,4 @@ function parse(tokens) {
 
   return program();
 }
+
