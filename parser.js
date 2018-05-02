@@ -1,5 +1,4 @@
-
-n parse(tokens) {
+function parse(tokens) {
   var i = 0;
 
   function has(tokenType) {

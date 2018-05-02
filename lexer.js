@@ -1,4 +1,5 @@
-DENTIFIER = 'IDENTIFIER';
+//expressions
+var IDENTIFIER = 'IDENTIFIER';
 var PLUS = 'PLUS';
 var DIVIDE = 'DIVIDE';
 var DASH = 'DASH';
