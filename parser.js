@@ -20,59 +20,81 @@ function parse(tokens) {
   }
 
   function statement() {
- //   if(has(PRINT) && has(BOOL)){
-//      devour();
-//      var message = expression();
-//      return new StatementBoolPrint();
-//  } else
     if(has(PRINT)){
-    devour();
-    var message = expression();
-    return new StatementPrint(message);
-  } else if(has(PRINTBITS)){
-    devour(); //printbits keyword
-    var message = expression();
-    return new StatementPrintBits(message);
-  } else if (has(IDENTIFIER)) {
-    var idToken = devour();
-    if (has(ASSIGN)){
       devour();
-      var rhs = expression();
-      return new StatementAssignment(idToken.source, rhs);
-    } else {
-      throw 'Error, expected assignment after variable name. [' + idToken + ']';
-    }
-  } else if(has(IF)){
-    return conditional();
-  } else if(has(WHILE)) {
-    return loop();
-  } else {
-    throw 'You messed up big time, idiot. I don\'t know ' + tokens[i].source;
-  }
+      var message = expression();
+      return new StatementPrint(message);
+    } else if(has(PRINTBITS)){
+      devour(); //printbits keyword
+      var message = expression();
+      return new StatementPrintBits(message);
+    } else if (has(IDENTIFIER)) {
+      var idToken = devour();
+      if (has(ASSIGN)){
+        devour();
+        var rhs = expression();
+        return new StatementAssignment(idToken.source, rhs);
+      } else if (has(LEFT_PARENTHESIS)) {
+        devour();
+        var actuals = [];
+        var delimeter = {type:COMMA}
+        while (!has(RIGHT_PARENTHESIS) /*&& delimeter.type != COMMA*/) {
+          actuals.push(expression());
+          // delimeter = devour();  //should be a comma...
+        }
+        devour();//eat right parenthesis.
+        return new StatementFunctionCall(idToken.source, actuals);
+      } else {
+        throw 'Error, expected assignment after variable name. [' + idToken + ']';  //TODO fix error message.
+      }
+    } else if(has(IF)){
+      return conditional();
+    } else if(has(WHILE)) {
+      return loop();
+    } else if (has(DEFINE)) {
+      devour(); // eat define keyword
+      var idToken = devour();
+      if(devour().type != LEFT_PARENTHESIS) {
+        throw 'Missing a left parenthesis after defining function [' + idToken + ']';
+      }
 
-    // if (has(RECTANGLE)) {
-    //   devour();
-    //   var leftExpression = expression();
-    //   var topExpression = expression();
-    //   var widthExpression = expression();
-    //   var heightExpression = expression();
-    //   return new StatementRectangle(leftExpression, topExpression, widthExpression, heightExpression);
-    // } else {
-    //   throw 'You messed up big time, idiot. I don\'t know ' + tokens[i].source;
-    // }
+      var formals = [];
+      var delimeter = {type:COMMA}
+      while (has(IDENTIFIER) && delimeter.type == COMMA) {
+        var formalToken = devour();
+        var delimeter = devour();
+        formals.push(formalToken.source);
+      }
+
+      if(delimeter.type != RIGHT_PARENTHESIS){
+        throw 'Missing a right parenthesis after defining function [' + idToken + ']';
+      }
+
+      var statements = [];
+      while (i < tokens.length && !has(DONE)) {
+        statements.push(statement());
+      }
+
+      devour();
+      return new StatementFunctionDefine(idToken.source, formals, new Block(statements));
+    } else {
+      console.log(i + "");
+      console.log(tokens.length);
+      throw 'You messed up big time, idiot. I don\'t know ' + tokens[i].type + ':' + tokens[i].source;
+    }
   }
 
   function loop() {
     devour(); //eat while keyword
 
     var condition = expression();
-    if(!has(THEN)){
+      if(!has(THEN)){
       throw 'expected "then" after "while" loop.\nloop: [' + condition.toString() + "]";
     }
-    devour();//eat then keyword
+      devour();//eat then keyword
     var statements = [];
 
-    while(i < tokens.length && !has(DONE)){
+    while(i < tokens.length-1 && !has(DONE)){
       statements.push(statement());
     }
 
@@ -92,7 +114,6 @@ function parse(tokens) {
     if(!has(THEN)){
       throw 'expected "then" after "if" conditional.\ncondition: [' + condition.toString() + "]";
     }
-
     devour(); //eat then keyword
 
     var ifstmts = [];
@@ -101,7 +122,7 @@ function parse(tokens) {
       ifstmts.push(statement());
     }
 
-    var keyword = devour(); //eat done keyword.
+    var keyword = devour(); //eat done/else keyword.
 
     if(keyword.type == ELSE){
       while(i < tokens.length && !has(DONE)){
@@ -117,14 +138,16 @@ function parse(tokens) {
 
   function expression() {
     var val;
-    if(has(FLIP) || has(NOT)){
-        var token = devour(); //see if flip or !
-        var toFlip = expression();
+    //note: This stuff up top makes it so we need parenthesis around the flip to make work...
+    if(has(FLIP) || has(NOT) /*|| has(DASH)*/){
+        var token = devour(); //see if flip or ! or -
         if(token.type == FLIP){
+        var toFlip = expression();
             val = new ExpressionFlip(toFlip);
-        } else {
-            val = new ExpressionBooleanNot(toFlip);
-        }
+      } else {
+        var toFlip = expression();
+        val = new ExpressionBooleanNot(toFlip);
+      }
     } else {
       val = bool();
     }
@@ -251,6 +274,14 @@ function parse(tokens) {
     if(has(BOOL)){
         var token = devour();
         return new ExpressionBoolLiteral(token.source);
+    } else if(has(DASH)) {
+      devour();
+      var pos_int = devour();
+      if(pos_int.type == INTEGER) {
+        return new ExpressionIntegerLiteral(parseInt('-' + pos_int.source));
+      } else {
+        throw "expected an integer after the dash (-) [" + pos_int + "]";
+      }
     } else if (has(INTEGER)) {
       var token = devour();
       return new ExpressionIntegerLiteral(parseInt(token.source));
@@ -270,7 +301,7 @@ function parse(tokens) {
       devour();
       var e = expression();
       if (!has(RIGHT_PARENTHESIS)) {
-        throw 'expression unbalanced';
+        throw "expression unbalanced, expected ')' after [" + e + "]";
       }
       devour();
       return e;

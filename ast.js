@@ -167,7 +167,11 @@ function ExpressionAdd(lExpression, rExpression) {
 
 function ExpressionSubtract(lExpression, rExpression) {
   this.evaluate = function(env) {
-    return lExpression.evaluate(env) - rExpression.evaluate(env);
+    if(lExpression == 0) {
+      return (0 - rExpression.evaluate(env));
+    } else {
+      return lExpression.evaluate(env) - rExpression.evaluate(env);
+    }
   }
 }
 
@@ -249,7 +253,7 @@ function StatementPrint(messageExpression) {
 function StatementPrintBits(messageExpression) {
     this.evaluate = function(env) {
       var message = messageExpression.evaluate(env);
-      var result = message.toString(2);
+      var result = (message >>> 0).toString(2);
       var output = document.getElementById('output');
       output.innerHTML = output.innerHTML + result + 'b<br>';
       console.log(message);
@@ -259,6 +263,30 @@ function StatementPrintBits(messageExpression) {
 function StatementAssignment(id, rhsExpression) {
   this.evaluate = function(env) {
     env[id] = rhsExpression.evaluate(env);
+  }
+}
+
+function StatementFunctionDefine(name, formals, body) {
+  this.evaluate = function(env) {
+    env[name] = {name: name, formals: formals, body: body};
+  }
+}
+
+function StatementFunctionCall(name, actuals) {
+  this.evaluate = function(env) {
+    if (env.hasOwnProperty(name)) {
+      var f = env[name];
+
+      var innerScope = {};
+      actuals.forEach((actual, i) => {
+        var formal = f.formals[i];
+        innerScope[formal] = actual.evaluate(env);
+      });
+
+      f.body.evaluate(innerScope);
+    } else {
+      throw 'no such function ' + name;
+    }
   }
 }
 /*
