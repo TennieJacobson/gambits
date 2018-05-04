@@ -41,6 +41,12 @@ function ExpressionIntegerLiteral(literal) {
   }
 }
 
+function ExpressionNullLiteral(literal) {
+  this.evaluate = function(env) {
+    return literal;
+  }
+}
+
 function ExpressionMore(a, b) {
   this.evaluate = function(env) {
     var valueA = a.evaluate(env);

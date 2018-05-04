@@ -294,6 +294,9 @@ function parse(tokens) {
     } else if(has(STRING)) {
         var token = devour();
         return new ExpressionStringLiteral(token.source);
+    } else if (has(NULL)) {
+      var token = devour();
+      return new ExpressionNullLiteral(token.source);
     } else if (has(IDENTIFIER)) {
       var token = devour();
       return new ExpressionVariableReference(token.source);

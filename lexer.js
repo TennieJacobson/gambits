@@ -31,6 +31,7 @@ var STRING = 'STRING';
 var BOOL = 'BOOL';
 var BITSTRING = 'BITSTRING';
 var FILE = 'FILE';
+var NULL = 'NULL'
 
 //bit operators
 var FLIP = 'FLIP';
@@ -237,7 +238,9 @@ function lex(source){
         emit(DEFINE);
       } else if(tokenSoFar == 'xor') {
         emit(XOR);
-      } else if(tokenSoFar == 'FILE'){
+      } else if(tokenSoFar == 'null') {
+        emit(NULL);
+      } else if(tokenSoFar == 'FILE') {
         emit(FILE);
       } else if(tokenSoFar == 'true' || tokenSoFar == 'false'){
           emit(BOOL);
