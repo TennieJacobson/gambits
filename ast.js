@@ -47,6 +47,12 @@ function ExpressionNullLiteral(literal) {
   }
 }
 
+function ExpressionListLiteral(literal) {
+  this.evaluate = function(env) {
+    return literal;
+  }
+}
+
 function ExpressionMore(a, b) {
   this.evaluate = function(env) {
     var valueA = a.evaluate(env);
@@ -239,7 +245,7 @@ function ExpressionIf(condition, thenBlock, elseBlock) {
   }
 }
 
-function ExpressionWhile(condition, block) {
+function StatementWhile(condition, block) {
   this.evaluate = function(env) {
     while(condition.evaluate(env) != 0) {
       block.evaluate(env);
@@ -251,19 +257,28 @@ function StatementPrint(messageExpression) {
   this.evaluate = function(env) {
     var message = messageExpression.evaluate(env);
     var output = document.getElementById('output');
-    output.innerHTML = output.innerHTML + message + '<br>';
-    console.log(message);
+    output.value = output.value + message + '\n';
+
+    output.value = output.value.replace(/\\n/g, "\n");
+    output.value = output.value.replace(/\\t/g, "\t");
+
   }
 }
 
 function StatementPrintBits(messageExpression) {
-    this.evaluate = function(env) {
-      var message = messageExpression.evaluate(env);
-      var result = (message >>> 0).toString(2);
-      var output = document.getElementById('output');
-      output.innerHTML = output.innerHTML + result + 'b<br>';
-      console.log(message);
+  this.evaluate = function(env) {
+    var message = messageExpression.evaluate(env);
+    var output = document.getElementById('output');
+    var result = message.toString(2);
+
+    if(typeof(message) != "string") {
+      output.value = output.value + result + 'b\n';
+    } else {
+      output.value = output.value + result + '\n';
+      output.value = output.value.replace(/\\n/g, "\n");
+      output.value = output.value.replace(/\\t/g, "\t");
     }
+  }
 }
 
 function StatementAssignment(id, rhsExpression) {
@@ -290,9 +305,20 @@ function StatementFunctionCall(name, actuals) {
       });
 
       f.body.evaluate(innerScope);
+      var temp = innerScope.__returnValue;
+      if(temp) {
+        delete innerScope.__returnValue; //test this...
+        return temp;
+      }
     } else {
-      throw 'no such function ' + name;
+      throw 'No such function: [' + name + ']';
     }
+  }
+}
+
+function StatementSend(value){
+  this.evaluate = function(env) {
+    env.__returnValue = value.evaluate(env);
   }
 }
 /*
@@ -300,22 +326,21 @@ Block
   Statements*
     Expressions*
     print "hello world!"
-isPrime = 227
 
 FUN FUNCTION FOR PRIMES
-i = 2
-check = 0
-while i < isPrime
-  if isPrime % i == 0 then
-    check = 1
+define isPrime(target)
+  i = 2
+  check = true
+
+  while i < target and check then
+    if target % i == 0 then
+      check = false
+    done
+    i = i + 1
   done
-  i = i + 1
+  send check
 done
 
-if check == 0 then
-  print "FOUND A PRIME!"
-else
-  print "Not a prime"
-done
+print isPrime(7)
 */
 

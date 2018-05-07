@@ -24,6 +24,10 @@ function parse(tokens) {
       devour();
       var message = expression();
       return new StatementPrint(message);
+    } else if(has(SEND)){
+      devour();
+      var retVal = expression();
+      return new StatementSend(retVal);
     } else if(has(PRINTBITS)){
       devour(); //printbits keyword
       var message = expression();
@@ -35,14 +39,16 @@ function parse(tokens) {
         var rhs = expression();
         return new StatementAssignment(idToken.source, rhs);
       } else if (has(LEFT_PARENTHESIS)) {
-        devour();
+        devour();//eat left parenthesis
         var actuals = [];
         var delimeter = {type:COMMA}
-        while (!has(RIGHT_PARENTHESIS) /*&& delimeter.type != COMMA*/) {
+
+        while (!has(RIGHT_PARENTHESIS) && delimeter.type == COMMA) {
           actuals.push(expression());
-          // delimeter = devour();  //should be a comma...
+          delimeter = devour();  //should be a comma.
         }
-        devour();//eat right parenthesis.
+        //console.log('right before StatementFunctionCall');
+
         return new StatementFunctionCall(idToken.source, actuals);
       } else {
         throw 'Error, expected assignment after variable name. [' + idToken + ']';  //TODO fix error message.
@@ -53,7 +59,7 @@ function parse(tokens) {
       return loop();
     } else if (has(DEFINE)) {
       devour(); // eat define keyword
-      var idToken = devour();
+      var idToken = devour(); //eat name of function
       if(devour().type != LEFT_PARENTHESIS) {
         throw 'Missing a left parenthesis after defining function [' + idToken + ']';
       }
@@ -62,7 +68,7 @@ function parse(tokens) {
       var delimeter = {type:COMMA}
       while (has(IDENTIFIER) && delimeter.type == COMMA) {
         var formalToken = devour();
-        var delimeter = devour();
+        delimeter = devour();
         formals.push(formalToken.source);
       }
 
@@ -74,8 +80,8 @@ function parse(tokens) {
       while (i < tokens.length && !has(DONE)) {
         statements.push(statement());
       }
-
-      devour();
+      console.log('out of while loop');
+      devour(); //eat done keyword
       return new StatementFunctionDefine(idToken.source, formals, new Block(statements));
     } else {
       console.log(i + "");
@@ -104,7 +110,7 @@ function parse(tokens) {
 
     devour(); //eat done keyword
     var block = new Block(statements);
-    return new ExpressionWhile(condition, block);
+    return new StatementWhile(condition, block);
   }
 
 
@@ -299,7 +305,38 @@ function parse(tokens) {
       return new ExpressionNullLiteral(token.source);
     } else if (has(IDENTIFIER)) {
       var token = devour();
+      if(has(LEFT_PARENTHESIS)){
+        devour();//eat left parenthesis
+        var actuals = [];
+        var delimeter = {type:COMMA}
+
+        while (!has(RIGHT_PARENTHESIS) && delimeter.type == COMMA) {
+          actuals.push(expression());
+          delimeter = devour();  //should be a comma.
+        }
+        //console.log('right before StatementFunctionCall');
+
+        return new StatementFunctionCall(token.source, actuals);
+      } else {
+        return new ExpressionVariableReference(token.source);
+      }
+    } else if (has(COMMA)) {
+      var token = devour();
       return new ExpressionVariableReference(token.source);
+    } else if(has(LEFT_SQUARE)) {
+      devour(); //eat left LEFT_SQUARE
+      var expressions = [];
+      var delimiter = {type:COMMA};
+
+      var next = devour();
+      if(next.type != RIGHT_SQUARE){
+        while(i < tokens.length && delimiter.type == COMMA){
+          expressions.push(expression());
+          delimeter = devour();
+        }
+      }
+
+      return new ExpressionListLiteral(expressions);
     } else if (has(LEFT_PARENTHESIS)) {
       devour();
       var e = expression();

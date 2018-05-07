@@ -21,7 +21,8 @@ var DONE = 'DONE';
 var DEFINE = 'DEFINE';
 var WHILE = 'WHILE';
 var PRINT = 'PRINT';
-var PRINTBITS = 'PRINTBITS'
+var PRINTBITS = 'PRINTBITS';
+var SEND = 'SEND';
 
 //literals
 var DECIMAL = 'DECIMAL';
@@ -243,7 +244,9 @@ function lex(source){
       } else if(tokenSoFar == 'FILE') {
         emit(FILE);
       } else if(tokenSoFar == 'true' || tokenSoFar == 'false'){
-          emit(BOOL);
+        emit(BOOL);
+      } else if(tokenSoFar == 'send'){
+        emit(SEND);
       } else {
         emit(IDENTIFIER)
       }
