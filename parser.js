@@ -322,7 +322,7 @@ function parse(tokens) {
       }
     } else if (has(COMMA)) {
       var token = devour();
-      return new ExpressionVariableReference(token.source);
+      return new ExpressionVariableReference(token.source); //is this right?
     } else if(has(LEFT_SQUARE)) {
       devour(); //eat left LEFT_SQUARE
       var expressions = [];
@@ -345,6 +345,23 @@ function parse(tokens) {
       }
       devour();
       return e;
+    } else if(has(FILE)){
+      devour();
+      // if(has(LEFT_PARENTHESIS)){
+      //   devour();
+      // } else {
+      //   throw 'expected open parenthesis before FILE url';
+      // }
+
+      // var url = expression(); //grab the URL
+      //
+      // if(has(RIGHT_PARENTHESIS)){
+      //   devour();
+      // } else {
+      //   throw 'expected closing parenthesis after FILE url'
+      // }
+
+      return new ExpressionFile();
     } else {
       throw 'I expected an expression. That\'s NOT what I found. ' + tokens[i].source;
     }

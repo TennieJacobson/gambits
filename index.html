@@ -14,15 +14,16 @@
     <h1>GamBits</h1>
 
     <div id="inputSide" class="col">
-        <textarea id="code" rows="35" style="width:100%"></textarea>
+        <textarea id="code" rows="33" style="width:100%"></textarea>
         <button id="btnRun" onclick="runCode()">Run!</button>
-        <button id="btnStop" onclick="stop()">Stop</button>
-        <div id="isRunning" style="float:left"></div>
+        <div class="file-drop">
+          <input type="file" id="file" name="file"/>
+        </div>
     </div>
 
     <div id="outputSide" class="col">
         <h2>Output</h2>
-        <textarea id="output" readonly></textarea>
+        <textarea id="output" rows="27" readonly></textarea>
     </div>
 
 </div>
@@ -49,7 +50,6 @@ document.getElementById('code').onkeydown = function(e) {
   }
 }
 
-var stopped = false;
 //run the code.
 function runCode(){
 
@@ -60,7 +60,7 @@ function runCode(){
 
     var text = document.getElementById('code').value;
 
-    console.log(text);
+    // console.log(text);
     var tokens = lex(text);
 
     console.log(tokens);
@@ -74,16 +74,6 @@ function runCode(){
   // stop();
   //feed through lexer, parser, then run.
 
-}
-
-function showRunning() {
-  stopped = false;
-  document.getElementById('isRunning').innerHTML = "Running...";
-}
-
-function stop() {
-  stopped = true;
-  document.getElementById('isRunning').innerHTML = "";
 }
 
 </script>

@@ -23,6 +23,25 @@ function ExpressionStringLiteral(literal) {
     }
 }
 
+function ExpressionFile(){
+  this.evaluate = async function(env) {
+    var file = document.getElementById('file').files[0];
+    console.log(file);
+    var reader = new FileReader();
+
+    var output;
+    reader.onload = function(event) {
+      output = event.target.result;
+      console.log(output);
+      Promise.resolve(output);
+    }
+
+    reader.readAsText(file);
+    await output;
+    return output;
+  }
+}
+
 function ExpressionBoolLiteral(literal){
     this.evaluate = function(env) {
         return literal;
@@ -263,6 +282,7 @@ function StatementWhile(condition, block) {
 function StatementPrint(messageExpression) {
   this.evaluate = function(env) {
     var message = messageExpression.evaluate(env);
+    console.log(message);
     var output = document.getElementById('output');
     output.value = output.value + message + '\n';
 

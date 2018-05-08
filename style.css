@@ -11,24 +11,52 @@
     float: left;
 }
 
-#output {
-    border-style: solid;
-    border-width: thin;
-    color: green;
-    width: 100%;
-    height: 400px;
-    overflow-y: auto;
-    overflow-x: auto;
-    padding: 5px;
-}
-
 button {
   font-weight: bold;
   border-radius: 3px;
   float:left;
   margin-right: 5px;
+  padding: 5px 10px;
+  background-color: black;
+  color: white;
+  border-color: rgba(20,20,20,1);
+  border-width:thick;
+}
+
+/* input[type="file"] {
+  display: none;
+} */
+
+.file-drop {
+    border: thin solid #000;
+    border-radius: 3px;
+    display: inline-block;
+    padding: 5px 10px;
+    margin-left: 50px;
+    color: white;
+    background-color: #222;
+}
+
+#output {
+    border-style: solid;
+    border-width: thin;
+    color: rgba(20, 20, 20, .8);
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 0px 5px 5px 5px;
 }
 
 #code, #output {
   resize: none;
+}
+
+#container {
+  width: 100%;
+  float: left;
+}
+
+body {
+  background-color: lightgray;
+  font-family: consolas, sans-serif;
 }
