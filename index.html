@@ -20,7 +20,7 @@
 
     <div id="outputSide" class="col">
         <h2>Output</h2>
-        <div id="output"></div>
+        <textarea id="output" readonly></textarea>
     </div>
 
 </div>
@@ -50,7 +50,7 @@ document.getElementById('code').onkeydown = function(e) {
 //run the code.
 function runCode(){
     //feed through lexer, parser, then run.
-    document.getElementById('output').innerHTML = "";
+    document.getElementById('output').value = "";
 
     var text = document.getElementById('code').value;
 
