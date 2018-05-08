@@ -6,7 +6,7 @@
 
 
 function Block(statements) {
-  this.evaluate = function(env) {
+  this.evaluate = function(env, callback) {
     statements.forEach(statement => statement.evaluate(env));
   }
 }
@@ -247,6 +247,13 @@ function ExpressionIf(condition, thenBlock, elseBlock) {
 
 function StatementWhile(condition, block) {
   this.evaluate = function(env) {
+    // function loop(){
+    //   if(condition.evaluate(env) != 0 && !stopped) {
+    //     block.evaluate(env);
+    //     (window.requestAnimationFrame || window.setTimeout)(loop);  //too slow.
+    //   }
+    // }
+    // loop();
     while(condition.evaluate(env) != 0) {
       block.evaluate(env);
     }
@@ -343,4 +350,3 @@ done
 
 print isPrime(7)
 */
-

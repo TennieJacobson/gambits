@@ -22,9 +22,11 @@
     padding: 5px;
 }
 
-#btnRun {
+button {
   font-weight: bold;
   border-radius: 3px;
+  float:left;
+  margin-right: 5px;
 }
 
 #code, #output {

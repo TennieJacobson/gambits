@@ -16,6 +16,8 @@
     <div id="inputSide" class="col">
         <textarea id="code" rows="35" style="width:100%"></textarea>
         <button id="btnRun" onclick="runCode()">Run!</button>
+        <button id="btnStop" onclick="stop()">Stop</button>
+        <div id="isRunning" style="float:left"></div>
     </div>
 
     <div id="outputSide" class="col">
@@ -47,9 +49,13 @@ document.getElementById('code').onkeydown = function(e) {
   }
 }
 
+var stopped = false;
 //run the code.
 function runCode(){
-    //feed through lexer, parser, then run.
+
+  //showRunning();
+
+  setTimeout(function(){
     document.getElementById('output').value = "";
 
     var text = document.getElementById('code').value;
@@ -63,6 +69,21 @@ function runCode(){
     var env = {};
     //evaluate the block from the parser.
     ast.evaluate(env);
+
+  }, 0);
+  // stop();
+  //feed through lexer, parser, then run.
+
+}
+
+function showRunning() {
+  stopped = false;
+  document.getElementById('isRunning').innerHTML = "Running...";
+}
+
+function stop() {
+  stopped = true;
+  document.getElementById('isRunning').innerHTML = "";
 }
 
 </script>

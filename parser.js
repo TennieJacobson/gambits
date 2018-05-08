@@ -94,10 +94,10 @@ function parse(tokens) {
     devour(); //eat while keyword
 
     var condition = expression();
-      if(!has(THEN)){
-      throw 'expected "then" after "while" loop.\nloop: [' + condition.toString() + "]";
-    }
-      devour();//eat then keyword
+    // if(!has(THEN)){
+    //   throw 'expected "then" after "while" loop.\nloop: [' + condition.toString() + "]";
+    // }
+    //   devour();//eat then keyword
     var statements = [];
 
     while(i < tokens.length-1 && !has(DONE)){
@@ -352,4 +352,3 @@ function parse(tokens) {
 
   return program();
 }
-
