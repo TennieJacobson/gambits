@@ -24,21 +24,8 @@ function ExpressionStringLiteral(literal) {
 }
 
 function ExpressionFile(){
-  this.evaluate = async function(env) {
-    var file = document.getElementById('file').files[0];
-    console.log(file);
-    var reader = new FileReader();
-
-    var output;
-    reader.onload = function(event) {
-      output = event.target.result;
-      console.log(output);
-      Promise.resolve(output);
-    }
-
-    reader.readAsText(file);
-    await output;
-    return output;
+  this.evaluate = function(env) {
+    return fileText;
   }
 }
 

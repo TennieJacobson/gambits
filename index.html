@@ -15,21 +15,43 @@
 
     <div id="inputSide" class="col">
         <textarea id="code" rows="33" style="width:100%"></textarea>
-        <button id="btnRun" onclick="runCode()">Run!</button>
+        <!-- <button id="btnRun" onclick="runCode()">Run!</button>
         <div class="file-drop">
           <input type="file" id="file" name="file"/>
-        </div>
+        </div> -->
     </div>
 
     <div id="outputSide" class="col">
         <h2>Output</h2>
         <textarea id="output" rows="27" readonly></textarea>
+        <!-- <div id="file-ready">...</div> -->
+    </div>
+
+    <div style="width:100%">
+      <button id="btnRun" onclick="runCode()">Run!</button>
+      <div class="file-drop">
+        <input type="file" id="file" name="file"/>
+      </div>
+      <div id="file-ready">...</div>
     </div>
 
 </div>
 
 </body>
 <script>
+
+var fileText;
+
+document.getElementById("file").addEventListener('change', function(){
+  document.getElementById("file-ready").innerHTML = '...';
+  var file = document.getElementById('file').files[0];
+  var reader = new FileReader();
+  reader.onload = function(event) {
+    fileText = event.target.result;
+    document.getElementById("file-ready").innerHTML = 'FILE is ready for use.';
+  }
+  reader.readAsText(file);
+});
 
 //set up tabs to work and ctl enter to run the code.
 document.getElementById('code').onkeydown = function(e) {
@@ -55,22 +77,22 @@ function runCode(){
 
   //showRunning();
 
-  setTimeout(function(){
-    document.getElementById('output').value = "";
+  // setTimeout(function(){
+  document.getElementById('output').value = "";
 
-    var text = document.getElementById('code').value;
+  var text = document.getElementById('code').value;
 
-    // console.log(text);
-    var tokens = lex(text);
+  // console.log(text);
+  var tokens = lex(text);
 
-    console.log(tokens);
-    var ast = parse(tokens);
+  console.log(tokens);
+  var ast = parse(tokens);
 
-    var env = {};
-    //evaluate the block from the parser.
-    ast.evaluate(env);
+  var env = {};
+  //evaluate the block from the parser.
+  ast.evaluate(env);
 
-  }, 0);
+  // }, 0);
   // stop();
   //feed through lexer, parser, then run.
 
