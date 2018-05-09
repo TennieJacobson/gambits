@@ -346,7 +346,7 @@ define isPrime(target)
   i = 2
   check = true
 
-  while i < target and check then
+  while i < target and check
     if target % i == 0 then
       check = false
     done
