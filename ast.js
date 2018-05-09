@@ -24,21 +24,41 @@ function ExpressionStringLiteral(literal) {
 }
 
 function ExpressionFile(){
-  this.evaluate = async function(env) {
+  this.evaluate = function(env) {
     var file = document.getElementById('file').files[0];
     console.log(file);
-    var reader = new FileReader();
 
-    var output;
-    reader.onload = function(event) {
-      output = event.target.result;
-      console.log(output);
-      Promise.resolve(output);
+    // const readTextFile = (input) => {
+    //   const reader = new FileReader();
+    //
+    //   return new Promise((resolve, reject) => {
+    //     reader.onload = function(event) {
+    //       // resolve(event.target.result);
+    //       resolve('from the promise!');
+    //     }
+    //
+    //     reader.onerror = function() {
+    //       reader.abort();
+    //       reject("!!!file was not read.!!!");
+    //     }
+    //
+    //     reader.readAsText(input);
+    //   });
+    // }
+
+    function check() {
+      if(ready === true){
+        return;
+      }
+      setTimeout(check, 1000);
     }
 
-    reader.readAsText(file);
-    await output;
-    return output;
+    var reader = new FileReader();
+    reader.onload = function()
+    // const result = await readTextFile(file);
+    // console.log(result);
+    return "This sucks";
+    // return result.value;
   }
 }
 
@@ -359,7 +379,7 @@ define isPrime(target)
   i = 2
   check = true
 
-  while i < target and check then
+  while i < target and check
     if target % i == 0 then
       check = false
     done
@@ -370,3 +390,4 @@ done
 
 print isPrime(7)
 */
+

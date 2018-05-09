@@ -347,6 +347,7 @@ function parse(tokens) {
       return e;
     } else if(has(FILE)){
       devour();
+
       // if(has(LEFT_PARENTHESIS)){
       //   devour();
       // } else {
@@ -369,3 +370,4 @@ function parse(tokens) {
 
   return program();
 }
+
