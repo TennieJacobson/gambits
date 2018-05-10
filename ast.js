@@ -63,7 +63,7 @@ function ExpressionListLiteral(literal) {
 function ExpressionDictionaryLiteral(keyVals) {
   this.evaluate = function(env) {
     var result = keyVals.reduce((res, item) => {
-      res[item.id] = item.value.evaluate(env);
+      res[item.id.evaluate(env)] = item.value.evaluate(env);
       return res;
     }, {});
     console.log(result);
@@ -266,7 +266,7 @@ function ExpressionIf(condition, thenBlock, elseBlock) {
 function ExpressionAccessObject(identifier, index) {
   this.evaluate = function(env) {
     var list = env[identifier];
-    return list[index.evaluate(env)].evaluate(env);
+    return list[index.evaluate(env)];
   }
 }
 
@@ -402,3 +402,4 @@ done
 
 print isPrime(7)
 */
+
