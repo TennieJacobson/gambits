@@ -345,7 +345,7 @@ function parse(tokens) {
           delimeter = devour();  //should be a comma.
         }
 
-        return new StatementFunctionCall(token.source, actuals);
+        return new ExpressionFunctionCall(token.source, actuals);
       } else if(has(LEFT_SQUARE) || has(LEFT_CURLY)){
         //accessing in lists.
         devour(); //eat left_something

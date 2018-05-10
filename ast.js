@@ -265,8 +265,14 @@ function ExpressionIf(condition, thenBlock, elseBlock) {
 
 function ExpressionAccessObject(identifier, index) {
   this.evaluate = function(env) {
-    var list = env[identifier];
-    return list[index.evaluate(env)];
+    var obj = env[identifier];
+
+    if(typeof obj == "string"){
+      return obj.charAt(index.evaluate(env));
+    } else {
+      return obj[index.evaluate(env)];
+    }
+
   }
 }
 
