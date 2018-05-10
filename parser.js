@@ -55,7 +55,7 @@ function parse(tokens) {
         }
       } else {
         // var idToken = devour();
-        if (has(ASSIGN)){
+        if (has(ASSIGN) || has(COLON)/*<-Not sure about this -Tennie's note */){
           devour();
           var rhs = expression();
           return new StatementAssignment(idToken.source, rhs);
@@ -387,14 +387,19 @@ function parse(tokens) {
         var delimiter = {type : COMMA};
         while(delimiter.type === COMMA) {
           // idToken = devour();
-          idToken = expression();
+          if(has(IDENTIFIER)) {
+            idToken = devour();
+          } else {
+            idToken = expression();
+          }
           if(has(COLON)){
             devour();//eat COLON
             var rhs = expression();
             var combo = {
               id : idToken,
               value : rhs
-            };
+            }
+
             keyVals.push(combo);
 
             delimiter = devour(); //eat comma or RIGHT_CURLY
