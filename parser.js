@@ -55,7 +55,7 @@ function parse(tokens) {
         }
       } else {
         // var idToken = devour();
-        if (has(ASSIGN)){
+        if (has(ASSIGN) || has(COLON)/*<-Not sure about this -Tennie's note */){
           devour();
           var rhs = expression();
           return new StatementAssignment(idToken.source, rhs);
@@ -110,12 +110,12 @@ function parse(tokens) {
       while (i < tokens.length && !has(DONE)) {
         statements.push(statement());
       }
-      console.log('out of while loop');
+      // console.log('out of while loop');
       devour(); //eat done keyword
       return new StatementFunctionDefine(idToken.source, formals, new Block(statements));
     } else {
-      console.log(i + "");
-      console.log(tokens.length);
+      // console.log(i + "");
+      // console.log(tokens.length);
       throw 'You messed up big time, idiot. I don\'t know ' + tokens[i].type + ':' + tokens[i].source;
     }
   }
@@ -383,31 +383,36 @@ function parse(tokens) {
       var keyVals = [];
 
       var idToken;
-      while(has(IDENTIFIER)){
-        idToken = devour();
+      if(!has(RIGHT_CURLY)) {
+        var delimiter = {type : COMMA};
+        while(delimiter.type === COMMA) {
+          // idToken = devour();
+          if(has(IDENTIFIER)) {
+            idToken = devour();
+          } else {
+            idToken = expression();
+          }
+          if(has(COLON)){
+            devour();//eat COLON
+            var rhs = expression();
+            var combo = {
+              id : idToken,
+              value : rhs
+            }
 
-        if(has(COLON)){
-          devour();//eat COLON
-        } else {
-          throw 'Expected colon after identifier in object [' + idToken.source + ']';
+            keyVals.push(combo);
+
+            delimiter = devour(); //eat comma or RIGHT_CURLY
+          } else {
+            throw 'Expected COLON after identifier in object [' + idToken.source + ']';
+          }
         }
-
-        var rhs = expression();
-
-        var combo = {
-          id : idToken.source,
-          value : rhs
-        };
-        keyVals.push(combo);
-
-        if(has(COMMA)){
-          devour();
-        } else if(!has(RIGHT_CURLY)){
-          throw 'Expected "}" to close off object [' + idToken.source + ']';
+        if(delimiter.type != RIGHT_CURLY) {
+          throw 'Expected RIGHT_CURLY after an object initialization [' + delimiter.source + ']';
         }
+      } else {
+        devour();
       }
-
-      devour(); //last RIGHT_CURLY
 
       return new ExpressionDictionaryLiteral(keyVals);
     } else if (has(LEFT_PARENTHESIS)) {
@@ -428,3 +433,4 @@ function parse(tokens) {
 
   return program();
 }
+

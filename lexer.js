@@ -272,3 +272,4 @@ function lex(source){
   emit(EOF);
   return tokens;
 }
+
