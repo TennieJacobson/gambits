@@ -281,8 +281,14 @@ function ExpressionAccessObject(identifier, index) {
 
 function StatementSetObject(identifier, index, value) {
   this.evaluate = function(env) {
-    var list = env[identifier];
-    list[index.evaluate(env)] = value.evaluate(env);
+    var obj = env[identifier];
+
+    if(typeof obj == "string"){
+      obj = obj.substring(0, index.evaluate(env)) + value.evaluate(env) + obj.substring(index.evaluate(env) + 1)
+      env[identifier] = obj;
+    } else {
+      obj[index.evaluate(env)] = value.evaluate(env);
+    }
   }
 }
 
@@ -411,4 +417,3 @@ done
 
 print isPrime(7)
 */
-
