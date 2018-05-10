@@ -89,6 +89,7 @@ function runCode(){
   var ast = parse(tokens);
 
   var env = {};
+  env.functions = {};
   //evaluate the block from the parser.
   ast.evaluate(env);
 
@@ -100,4 +101,3 @@ function runCode(){
 
 </script>
 </html>
-

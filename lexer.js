@@ -50,6 +50,7 @@ var LEFT_SQUARE = 'LEFT_SQUARE';
 var RIGHT_SQUARE = 'RIGHT_SQUARE';
 var LEFT_CURLY = 'LEFT_CURLY';
 var RIGHT_CURLY = 'RIGHT_CURLY';
+var COLON = 'COLON';
 
 //comparators
 var MORE_OR_EQUAL = 'MORE_OR_EQUAL';
@@ -104,6 +105,9 @@ function lex(source){
     } else if (has(/,/)) {
       devour();
       emit(COMMA);
+    } else if(has(/:/)) {
+      devour();
+      emit(COLON);
     } else if (has(/\"/)) {
       skip();
       while(has(/[^"]/)){
@@ -268,5 +272,3 @@ function lex(source){
   emit(EOF);
   return tokens;
 }
-
-

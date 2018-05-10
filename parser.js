@@ -34,24 +34,48 @@ function parse(tokens) {
       return new StatementPrintBits(message);
     } else if (has(IDENTIFIER)) {
       var idToken = devour();
-      if (has(ASSIGN)){
-        devour();
-        var rhs = expression();
-        return new StatementAssignment(idToken.source, rhs);
-      } else if (has(LEFT_PARENTHESIS)) {
-        devour();//eat left parenthesis
-        var actuals = [];
-        var delimeter = {type:COMMA}
+      //check for LEFT_SQUARE
+      if(has(LEFT_SQUARE) || has(LEFT_CURLY)){
+        //list index assignment.
+        devour(); //eat LEFT_something
 
-        while (!has(RIGHT_PARENTHESIS) && delimeter.type == COMMA) {
-          actuals.push(expression());
-          delimeter = devour();  //should be a comma.
+        var index = expression();
+        if(has(RIGHT_SQUARE) || has(RIGHT_CURLY))){
+          devour();
+        } else {
+          throw 'Expected closing bracket for list/dictionary assignment [' + idToken.source + ']';
         }
-        //console.log('right before StatementFunctionCall');
 
-        return new StatementFunctionCall(idToken.source, actuals);
+        if(has(ASSIGN)){
+          devour();
+          var rhs = expression();
+          return new StatementSetObject(idToken.source, index, rhs);
+        } else {
+          throw 'Expected assignment after attempt to set index of object [' + idToken.source + ']';
+        }
       } else {
-        throw 'Error, expected assignment after variable name. [' + idToken + ']';  //TODO fix error message.
+        // var idToken = devour();
+        if (has(ASSIGN)){
+          devour();
+          var rhs = expression();
+          return new StatementAssignment(idToken.source, rhs);
+        } else if (has(LEFT_PARENTHESIS)) {
+          devour();//eat left parenthesis
+          var actuals = [];
+          var delimeter = {type:COMMA}
+          if(!has(RIGHT_PARENTHESIS)){
+            while(delimeter.type == COMMA) {
+              actuals.push(expression());
+              delimeter = devour();  //should be a comma.
+            }
+          } else {
+            devour(); //right parenthesis
+          }
+
+          return new ExpressionFunctionCall(idToken.source, actuals);
+        } else {
+          throw 'Error, expected assignment after variable name. [' + idToken.source + ']';  //TODO fix error message.
+        }
       }
     } else if(has(IF)){
       return conditional();
@@ -60,20 +84,26 @@ function parse(tokens) {
     } else if (has(DEFINE)) {
       devour(); // eat define keyword
       var idToken = devour(); //eat name of function
-      if(devour().type != LEFT_PARENTHESIS) {
-        throw 'Missing a left parenthesis after defining function [' + idToken + ']';
+      if(!has(LEFT_PARENTHESIS)) {
+        throw 'Missing a left parenthesis after defining function [' + idToken.source + ']';
+      } else {
+        devour();
       }
 
       var formals = [];
       var delimeter = {type:COMMA}
-      while (has(IDENTIFIER) && delimeter.type == COMMA) {
-        var formalToken = devour();
-        delimeter = devour();
-        formals.push(formalToken.source);
-      }
+      if(!has(RIGHT_PARENTHESIS)){
+        while (has(IDENTIFIER) && delimeter.type == COMMA) {
+          var formalToken = devour();
+          delimeter = devour();
+          formals.push(formalToken.source);
+        }
 
-      if(delimeter.type != RIGHT_PARENTHESIS){
-        throw 'Missing a right parenthesis after defining function [' + idToken + ']';
+        if(delimeter.type != RIGHT_PARENTHESIS){
+          throw 'Missing a right parenthesis after defining function [' + idToken.source + ']';
+        }
+      } else {
+        devour();//eat right parenthesis
       }
 
       var statements = [];
@@ -94,10 +124,10 @@ function parse(tokens) {
     devour(); //eat while keyword
 
     var condition = expression();
-    // if(!has(THEN)){
-    //   throw 'expected "then" after "while" loop.\nloop: [' + condition.toString() + "]";
-    // }
-    //   devour();//eat then keyword
+    if(!has(THEN)){
+      throw 'expected "then" after "while" loop.\nloop: [' + condition.toString() + "]";
+    }
+    devour(); //eat then keyword
     var statements = [];
 
     while(i < tokens.length-1 && !has(DONE)){
@@ -314,29 +344,72 @@ function parse(tokens) {
           actuals.push(expression());
           delimeter = devour();  //should be a comma.
         }
-        //console.log('right before StatementFunctionCall');
 
         return new StatementFunctionCall(token.source, actuals);
+      } else if(has(LEFT_SQUARE) || has(LEFT_CURLY)){
+        //accessing in lists.
+        devour(); //eat left_something
+        var index = expression();
+        if(has(RIGHT_SQUARE) || has(RIGHT_CURLY)){
+          devour();
+        } else {
+          throw 'expected "]/}" to close list reference for [' + token.source + ']'
+        }
+
+        return new ExpressionAccessObject(token.source, index);
       } else {
         return new ExpressionVariableReference(token.source);
       }
-    } else if (has(COMMA)) {
-      var token = devour();
-      return new ExpressionVariableReference(token.source); //is this right?
     } else if(has(LEFT_SQUARE)) {
       devour(); //eat left LEFT_SQUARE
       var expressions = [];
-      var delimiter = {type:COMMA};
 
-      var next = devour();
-      if(next.type != RIGHT_SQUARE){
-        while(i < tokens.length && delimiter.type == COMMA){
+      if(!has(RIGHT_SQUARE)){
+        var delimiter = {type:COMMA};
+        while(delimiter.type === COMMA){
           expressions.push(expression());
-          delimeter = devour();
+          delimiter = devour();
         }
+        if(delimiter.type != RIGHT_SQUARE){
+          throw 'Expected "]" to end list initiation.';
+        }
+      } else {
+        devour();
       }
 
       return new ExpressionListLiteral(expressions);
+    } else if(has(LEFT_CURLY)){
+      devour();//eat LEFT_CURLY
+      var keyVals = [];
+
+      var idToken;
+      while(has(IDENTIFIER)){
+        idToken = devour();
+
+        if(has(COLON)){
+          devour();//eat COLON
+        } else {
+          throw 'Expected colon after identifier in object [' + idToken.source + ']';
+        }
+
+        var rhs = expression();
+
+        var combo = {
+          id : idToken.source,
+          value : rhs
+        };
+        keyVals.push(combo);
+
+        if(has(COMMA)){
+          devour();
+        } else if(!has(RIGHT_CURLY)){
+          throw 'Expected "}" to close off object [' + idToken.source + ']';
+        }
+      }
+
+      devour(); //last RIGHT_CURLY
+
+      return new ExpressionDictionaryLiteral(keyVals);
     } else if (has(LEFT_PARENTHESIS)) {
       devour();
       var e = expression();
@@ -347,21 +420,6 @@ function parse(tokens) {
       return e;
     } else if(has(FILE)){
       devour();
-
-      // if(has(LEFT_PARENTHESIS)){
-      //   devour();
-      // } else {
-      //   throw 'expected open parenthesis before FILE url';
-      // }
-
-      // var url = expression(); //grab the URL
-      //
-      // if(has(RIGHT_PARENTHESIS)){
-      //   devour();
-      // } else {
-      //   throw 'expected closing parenthesis after FILE url'
-      // }
-
       return new ExpressionFile();
     } else {
       throw 'I expected an expression. That\'s NOT what I found. ' + tokens[i].source;
@@ -370,4 +428,3 @@ function parse(tokens) {
 
   return program();
 }
-

@@ -55,7 +55,19 @@ function ExpressionNullLiteral(literal) {
 
 function ExpressionListLiteral(literal) {
   this.evaluate = function(env) {
-    return literal;
+    var result = literal.map((item) => item.evaluate(env));
+    return result;
+  }
+}
+
+function ExpressionDictionaryLiteral(keyVals) {
+  this.evaluate = function(env) {
+    var result = keyVals.reduce((res, item) => {
+      res[item.id] = item.value.evaluate(env);
+      return res;
+    }, {});
+    console.log(result);
+    return result;
   }
 }
 
@@ -251,15 +263,22 @@ function ExpressionIf(condition, thenBlock, elseBlock) {
   }
 }
 
+function ExpressionAccessObject(identifier, index) {
+  this.evaluate = function(env) {
+    var list = env[identifier];
+    return list[index.evaluate(env)].evaluate(env);
+  }
+}
+
+function StatementSetObject(identifier, index, value) {
+  this.evaluate = function(env) {
+    var list = env[identifier];
+    list[index.evaluate(env)] = value.evaluate(env);
+  }
+}
+
 function StatementWhile(condition, block) {
   this.evaluate = function(env) {
-    // function loop(){
-    //   if(condition.evaluate(env) != 0 && !stopped) {
-    //     block.evaluate(env);
-    //     (window.requestAnimationFrame || window.setTimeout)(loop);  //too slow.
-    //   }
-    // }
-    // loop();
     while(condition.evaluate(env) != 0) {
       block.evaluate(env);
     }
@@ -269,6 +288,12 @@ function StatementWhile(condition, block) {
 function StatementPrint(messageExpression) {
   this.evaluate = function(env) {
     var message = messageExpression.evaluate(env);
+
+    //lists
+    if(typeof(message) === "object"){
+        message = JSON.stringify(message);
+    }
+
     console.log(message);
     var output = document.getElementById('output');
     output.value = output.value + message + '\n';
@@ -283,9 +308,28 @@ function StatementPrintBits(messageExpression) {
   this.evaluate = function(env) {
     var message = messageExpression.evaluate(env);
     var output = document.getElementById('output');
-    var result = message.toString(2);
 
-    if(typeof(message) != "string") {
+    var result;
+    if(typeof(message) === "object"){
+      //list
+      if(message instanceof Array){
+        result = message.map((item) => {
+          if(typeof(item) != "string"){
+            item = item.toString(2) + 'b';
+          }
+          return item;
+        });
+        result = JSON.stringify(result);
+      } else {
+        // printbits for objects doesn't really make sense.
+        result = JSON.stringify(message);
+      }
+    } else {
+      var result = message.toString(2);
+    }
+
+
+    if(typeof(message) != "string" && typeof(message) != "object") {
       output.value = output.value + result + 'b\n';
     } else {
       output.value = output.value + result + '\n';
@@ -303,16 +347,17 @@ function StatementAssignment(id, rhsExpression) {
 
 function StatementFunctionDefine(name, formals, body) {
   this.evaluate = function(env) {
-    env[name] = {name: name, formals: formals, body: body};
+    env.functions[name] = {name: name, formals: formals, body: body};
   }
 }
 
-function StatementFunctionCall(name, actuals) {
+function ExpressionFunctionCall(name, actuals) {
   this.evaluate = function(env) {
-    if (env.hasOwnProperty(name)) {
-      var f = env[name];
+    if (env.functions.hasOwnProperty(name)) {
+      var f = env.functions[name];
 
       var innerScope = {};
+      innerScope.functions = env.functions;
       actuals.forEach((actual, i) => {
         var formal = f.formals[i];
         innerScope[formal] = actual.evaluate(env);
