@@ -266,7 +266,7 @@ function ExpressionIf(condition, thenBlock, elseBlock) {
 function ExpressionAccessObject(identifier, index) {
   this.evaluate = function(env) {
     var list = env[identifier];
-    return list[index.evaluate(env)].evaluate(env);
+    return list[index.evaluate(env)];
   }
 }
 

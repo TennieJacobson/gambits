@@ -40,7 +40,7 @@ function parse(tokens) {
         devour(); //eat LEFT_something
 
         var index = expression();
-        if(has(RIGHT_SQUARE) || has(RIGHT_CURLY))){
+        if(has(RIGHT_SQUARE) || has(RIGHT_CURLY)){
           devour();
         } else {
           throw 'Expected closing bracket for list/dictionary assignment [' + idToken.source + ']';
@@ -414,7 +414,7 @@ function parse(tokens) {
       devour();
       var e = expression();
       if (!has(RIGHT_PARENTHESIS)) {
-        throw "expression unbalanced, expected ')' after [" + e + "]";
+        throw "Expression unbalanced, expected ')' after [" + e + "]";
       }
       devour();
       return e;
