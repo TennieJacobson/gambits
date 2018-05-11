@@ -41,7 +41,6 @@ var BIT_OR = 'BIT_OR';
 var XOR = 'XOR';
 var R_SHIFT = 'R_SHIFT';
 var L_SHIFT = 'L_SHIFT';
-var ONES_COMP = 'ONES_COMP';
 
 //brackets
 var LEFT_PARENTHESIS = 'LEFT_PARENTHESIS';
@@ -93,12 +92,7 @@ function lex(source){
   while (i < source.length) {
     if (has(/\+/)) {
       devour();
-      if(has(/\+/)){
-        devour();
-        emit(ONES_COMP);
-      } else {
-        emit(PLUS);
-      }
+      emit(PLUS);
     } else if (has(/%/)) {
       devour();
       emit(MOD);
@@ -272,4 +266,3 @@ function lex(source){
   emit(EOF);
   return tokens;
 }
-

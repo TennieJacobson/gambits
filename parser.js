@@ -110,12 +110,9 @@ function parse(tokens) {
       while (i < tokens.length && !has(DONE)) {
         statements.push(statement());
       }
-      // console.log('out of while loop');
       devour(); //eat done keyword
       return new StatementFunctionDefine(idToken.source, formals, new Block(statements));
     } else {
-      // console.log(i + "");
-      // console.log(tokens.length);
       throw 'You messed up big time, idiot. I don\'t know ' + tokens[i].type + ':' + tokens[i].source;
     }
   }
@@ -386,7 +383,6 @@ function parse(tokens) {
       if(!has(RIGHT_CURLY)) {
         var delimiter = {type : COMMA};
         while(delimiter.type === COMMA) {
-          // idToken = devour();
           if(has(IDENTIFIER)) {
             idToken = devour();
           } else {
@@ -433,4 +429,3 @@ function parse(tokens) {
 
   return program();
 }
-

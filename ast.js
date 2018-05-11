@@ -1,9 +1,4 @@
-//Abstract Statement Tree
-// going to need lists still, which includes assigning a variable versus just accessing one
-// printbits will be needed.
-// function capabilities
-// almost there!
-
+//Abstract Syntax Tree
 
 function Block(statements) {
   this.evaluate = function(env, callback) {
@@ -309,7 +304,7 @@ function StatementPrint(messageExpression) {
         message = JSON.stringify(message);
     }
 
-    console.log(message);
+    // console.log(message);
     var output = document.getElementById('output');
     output.value = output.value + message + '\n';
 
@@ -399,21 +394,4 @@ function StatementSend(value){
 Block
   Statements*
     Expressions*
-    print "hello world!"
-
-FUN FUNCTION FOR PRIMES
-define isPrime(target)
-  i = 2
-  check = true
-
-  while i < target and check
-    if target % i == 0 then
-      check = false
-    done
-    i = i + 1
-  done
-  send check
-done
-
-print isPrime(7)
 */
